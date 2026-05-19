@@ -1,0 +1,392 @@
+/* ============================================================
+   NexQ — Global Stylesheet
+   Bootstrap 5 Extension + Custom Design System
+   ============================================================ */
+
+:root {
+    /* Professional Enterprise Theme */
+    --nexq-purple: #0052cc; /* Keeping variable name to avoid refactoring HTML, but it's blue now */
+    --nexq-purple-dark: #0747a6;
+    --nexq-purple-light: rgba(0, 82, 204, 0.1);
+    --nexq-bg: #f4f5f7; /* Light gray background */
+    --nexq-bg-2: #ffffff; /* White cards */
+    --nexq-bg-3: #ebecf0;
+    --nexq-border: #dfe1e6;
+    --nexq-text: #172b4d; /* Dark text */
+    --nexq-text-muted: #5e6c84;
+    --nexq-success: #00875a;
+    --nexq-warning: #ff991f;
+    --nexq-danger: #de350b;
+    --nexq-info: #0065ff;
+    --font: 'Inter', sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    font-family: var(--font);
+    background: var(--nexq-bg);
+    color: var(--nexq-text);
+    min-height: 100vh;
+}
+
+/* ─── AUTH PAGE ──────────────────────────────────────────────── */
+.auth-page { background: var(--nexq-bg); }
+
+.auth-bg {
+    min-height: 100vh;
+    background: var(--nexq-bg);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Removed dramatic gradient bubbles to look more professional */
+
+/* ─── BRAND ──────────────────────────────────────────────────── */
+.brand-logo {
+    width: 72px; height: 72px;
+    background: linear-gradient(135deg, var(--nexq-purple), #a29bfe);
+    border-radius: 20px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 36px; color: white;
+    box-shadow: 0 8px 32px rgba(108,92,231,0.4);
+}
+
+.brand-logo-sm {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--nexq-purple), #a29bfe);
+    border-radius: 10px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 18px; color: white;
+    margin-right: 8px;
+}
+
+.brand-title {
+    font-size: 2.5rem; font-weight: 800;
+    background: linear-gradient(135deg, #a29bfe, #ffffff);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; letter-spacing: -1px;
+}
+
+.brand-subtitle { color: var(--nexq-text-muted); font-size: 0.95rem; }
+
+/* ─── STANDARD CARD (Formerly Glass Card) ─────────────────────── */
+.glass-card {
+    background: var(--nexq-bg-2);
+    border: 1px solid var(--nexq-border);
+    border-radius: 12px;
+    padding: 32px;
+    box-shadow: 0 4px 12px rgba(9, 30, 66, 0.05);
+}
+
+/* ─── AUTH TABS ──────────────────────────────────────────────── */
+.auth-tabs {
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    padding: 4px;
+    gap: 4px;
+}
+
+.auth-tabs .nav-link {
+    color: var(--nexq-text-muted);
+    border-radius: 10px;
+    font-weight: 500;
+    transition: all 0.2s;
+    border: none;
+}
+
+.auth-tabs .nav-link.active {
+    background: var(--nexq-purple);
+    color: white;
+    box-shadow: 0 4px 16px rgba(108,92,231,0.4);
+}
+
+/* ─── FORM CONTROLS ──────────────────────────────────────────── */
+.form-control, .form-select {
+    background: #ffffff;
+    border: 2px solid var(--nexq-border);
+    color: var(--nexq-text);
+    border-radius: 6px;
+    padding: 10px 14px;
+    transition: all 0.2s;
+}
+
+.form-control:focus, .form-select:focus {
+    background: #ffffff;
+    border-color: var(--nexq-purple);
+    color: var(--nexq-text);
+    box-shadow: none;
+    outline: none;
+}
+
+.form-control::placeholder { color: var(--nexq-text-muted); }
+.form-label { color: var(--nexq-text-muted); font-size: 0.85rem; font-weight: 500; margin-bottom: 6px; }
+
+.input-group-text {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--nexq-border);
+    color: var(--nexq-text-muted);
+    border-radius: 10px 0 0 10px;
+}
+
+.input-group .form-control { border-radius: 0; }
+.input-group .form-control:last-child { border-radius: 0 10px 10px 0; }
+.input-group .input-group-text:last-child { border-radius: 0 10px 10px 0; cursor: pointer; }
+.input-group .input-group-text:last-child:hover { color: var(--nexq-purple); }
+
+/* ─── BUTTONS ────────────────────────────────────────────────── */
+.btn-primary-nexq {
+    background: var(--nexq-purple);
+    color: white; border: none;
+    border-radius: 6px; font-weight: 600;
+    padding: 10px 16px;
+    transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(0, 82, 204, 0.2);
+}
+
+.btn-primary-nexq:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 82, 204, 0.3);
+    color: white;
+    background: var(--nexq-purple-dark);
+}
+
+.btn-success-nexq {
+    background: var(--nexq-success);
+    color: white; border: none; border-radius: 6px;
+    font-weight: 600; padding: 10px 16px;
+    transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(0, 135, 90, 0.2);
+}
+
+.btn-success-nexq:hover { transform: translateY(-1px); color: white; box-shadow: 0 4px 8px rgba(0, 135, 90, 0.3); background: #006b47; }
+
+.btn-outline-nexq {
+    border: 1px solid var(--nexq-border);
+    color: var(--nexq-text);
+    border-radius: 6px; font-weight: 500; padding: 8px 16px;
+    transition: all 0.2s; background: #ffffff;
+    box-shadow: 0 1px 2px rgba(9, 30, 66, 0.05);
+}
+
+.btn-outline-nexq:hover { background: #f4f5f7; color: var(--nexq-text); }
+
+.btn-xs { padding: 4px 10px; font-size: 0.75rem; border-radius: 6px; }
+
+/* ─── FEATURE PILLS ──────────────────────────────────────────── */
+.feature-pill {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--nexq-border);
+    border-radius: 12px; padding: 10px;
+    text-align: center; display: flex;
+    flex-direction: column; align-items: center; gap: 4px;
+    font-size: 0.8rem; color: var(--nexq-text-muted);
+}
+
+/* ─── NAVBAR ─────────────────────────────────────────────────── */
+.nexq-navbar {
+    background: #ffffff;
+    border-bottom: 1px solid var(--nexq-border);
+    padding: 12px 0;
+    position: sticky; top: 0; z-index: 1000;
+    box-shadow: 0 2px 4px rgba(9, 30, 66, 0.05);
+}
+
+.nexq-navbar .navbar-brand {
+    font-weight: 700; font-size: 1.4rem; color: var(--nexq-text);
+    display: flex; align-items: center;
+}
+
+.role-badge {
+    background: var(--nexq-purple-light);
+    border: 1px solid var(--nexq-purple);
+    color: var(--nexq-purple);
+    font-size: 0.7rem; padding: 4px 10px;
+    border-radius: 20px;
+}
+
+.role-badge.staff { border-color: var(--nexq-success); color: var(--nexq-success); background: rgba(0,184,148,0.1); }
+.role-badge.admin { border-color: var(--nexq-warning); color: var(--nexq-warning); background: rgba(253,203,110,0.1); }
+
+/* ─── DASHBOARD PAGE ─────────────────────────────────────────── */
+.dashboard-page { background: var(--nexq-bg); }
+
+.welcome-banner {
+    background: #ffffff;
+    border: 1px solid var(--nexq-border);
+    border-radius: 8px; padding: 24px;
+    display: flex; justify-content: space-between; align-items: center;
+    box-shadow: 0 2px 4px rgba(9, 30, 66, 0.05);
+}
+
+.staff-banner { border-left: 4px solid var(--nexq-success); }
+.admin-banner { border-left: 4px solid var(--nexq-warning); }
+
+.welcome-icon { font-size: 3rem; opacity: 0.3; }
+.section-title { font-weight: 700; color: var(--nexq-text); font-size: 1rem; }
+
+/* ─── QUEUE CARD ─────────────────────────────────────────────── */
+.queue-card {
+    background: var(--nexq-bg-2);
+    border: 1px solid var(--nexq-border);
+    border-radius: 16px; padding: 20px;
+    transition: all 0.3s; cursor: default;
+    height: 100%;
+}
+
+.queue-card:hover {
+    border-color: rgba(108,92,231,0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(108,92,231,0.15);
+}
+
+.queue-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+.queue-name { font-weight: 700; font-size: 1rem; margin: 0; }
+.queue-location { font-size: 0.78rem; color: var(--nexq-text-muted); }
+.queue-desc { font-size: 0.83rem; color: var(--nexq-text-muted); margin: 8px 0; line-height: 1.4; }
+
+.queue-status-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    margin-top: 4px; flex-shrink: 0;
+}
+.queue-status-dot.active { background: var(--nexq-success); box-shadow: 0 0 8px rgba(0,184,148,0.6); animation: pulse 2s infinite; }
+.queue-status-dot.inactive { background: var(--nexq-text-muted); }
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; } 50% { opacity: 0.5; }
+}
+
+.queue-stats { display: flex; gap: 16px; padding: 12px 0; border-top: 1px solid var(--nexq-border); margin: 10px 0; }
+.stat-item { text-align: center; }
+.stat-value { display: block; font-size: 1.5rem; font-weight: 800; }
+.stat-label { font-size: 0.7rem; color: var(--nexq-text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.queue-footer { display: flex; justify-content: space-between; align-items: center; }
+
+/* ─── TOKEN CARD ─────────────────────────────────────────────── */
+.token-card {
+    background: var(--nexq-bg-2);
+    border: 1px solid var(--nexq-border);
+    border-radius: 16px; padding: 20px;
+    text-align: center;
+}
+
+.token-card.waiting { border-color: rgba(253,203,110,0.4); }
+.token-card.serving { border-color: rgba(0,184,148,0.4); background: rgba(0,184,148,0.05); }
+
+.token-number { font-size: 3.5rem; font-weight: 900; color: var(--nexq-purple); line-height: 1; }
+.token-number-sm { font-size: 2rem; font-weight: 900; }
+.token-queue { font-size: 0.9rem; color: var(--nexq-text-muted); margin: 6px 0; }
+
+.token-status-badge {
+    display: inline-block; padding: 4px 14px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;
+}
+.token-status-badge.waiting { background: rgba(253,203,110,0.2); color: var(--nexq-warning); border: 1px solid rgba(253,203,110,0.4); }
+.token-status-badge.serving { background: rgba(0,184,148,0.2); color: var(--nexq-success); border: 1px solid rgba(0,184,148,0.4); }
+.token-status-badge.completed { background: rgba(9,132,227,0.2); color: var(--nexq-info); border: 1px solid rgba(9,132,227,0.4); }
+.token-status-badge.expired { background: rgba(214,48,49,0.2); color: var(--nexq-danger); border: 1px solid rgba(214,48,49,0.4); }
+.token-status-badge.skipped { background: rgba(108,92,231,0.2); color: #a29bfe; border: 1px solid rgba(108,92,231,0.4); }
+
+.token-info { display: flex; justify-content: center; gap: 20px; font-size: 0.82rem; color: var(--nexq-text-muted); }
+
+/* ─── NEXQ TABLE ─────────────────────────────────────────────── */
+.nexq-card { background: var(--nexq-bg-2); border: 1px solid var(--nexq-border); border-radius: 8px; box-shadow: 0 2px 4px rgba(9, 30, 66, 0.05); }
+.nexq-table { color: var(--nexq-text); border-color: var(--nexq-border); margin-bottom: 0; }
+.nexq-table thead th { background: #fafbfc; border-color: var(--nexq-border); color: var(--nexq-text-muted); font-size: 0.85rem; font-weight: 600; padding: 12px 16px; border-bottom: 2px solid var(--nexq-border); }
+.nexq-table tbody td { border-color: var(--nexq-border); padding: 12px 16px; vertical-align: middle; }
+.nexq-table tbody tr:hover { background: #f4f5f7; }
+
+/* ─── STATUS BADGES ──────────────────────────────────────────── */
+.status-badge-waiting { background: rgba(253,203,110,0.2); color: var(--nexq-warning); }
+.status-badge-serving { background: rgba(0,184,148,0.2); color: var(--nexq-success); }
+.status-badge-completed { background: rgba(9,132,227,0.2); color: var(--nexq-info); }
+.status-badge-expired { background: rgba(214,48,49,0.2); color: var(--nexq-danger); }
+.status-badge-skipped { background: rgba(108,92,231,0.2); color: #a29bfe; }
+
+/* ─── MODAL ──────────────────────────────────────────────────── */
+.nexq-modal {
+    background: var(--nexq-bg-2);
+    border: 1px solid var(--nexq-border);
+    border-radius: 20px; color: var(--nexq-text);
+}
+
+.nexq-modal .modal-header { border-bottom: 1px solid var(--nexq-border); }
+/* Removed invert on modal close button because modal background is now white */
+.btn-close-white { filter: none; opacity: 0.5; }
+.btn-close-white:hover { opacity: 0.8; }
+
+/* ─── JOIN QUEUE ICON ─────────────────────────────────────────── */
+.join-queue-icon {
+    width: 80px; height: 80px;
+    background: var(--nexq-purple-light);
+    border-radius: 20px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem; color: var(--nexq-purple);
+}
+
+/* ─── STAT MINI (STAFF) ──────────────────────────────────────── */
+.stat-mini {
+    border-radius: 12px; padding: 14px;
+    text-align: center; display: flex; flex-direction: column; gap: 2px;
+}
+.stat-mini span { font-size: 2rem; font-weight: 800; }
+.stat-mini small { font-size: 0.72rem; color: var(--nexq-text-muted); }
+.stat-mini.waiting { background: rgba(253,203,110,0.1); border: 1px solid rgba(253,203,110,0.3); }
+.stat-mini.waiting span { color: var(--nexq-warning); }
+.stat-mini.serving { background: rgba(0,184,148,0.1); border: 1px solid rgba(0,184,148,0.3); }
+.stat-mini.serving span { color: var(--nexq-success); }
+.stat-mini.done { background: rgba(9,132,227,0.1); border: 1px solid rgba(9,132,227,0.3); }
+.stat-mini.done span { color: var(--nexq-info); }
+
+/* ─── SERVING TOKEN CARD (STAFF) ─────────────────────────────── */
+.serving-token-card {
+    background: rgba(0,184,148,0.05);
+    border: 1px solid rgba(0,184,148,0.3);
+    border-radius: 16px; padding: 20px;
+}
+
+/* ─── KPI CARDS (ADMIN) ──────────────────────────────────────── */
+.kpi-card {
+    border-radius: 16px; padding: 20px;
+    display: flex; flex-direction: column; gap: 6px;
+    border: 1px solid var(--nexq-border);
+    position: relative; overflow: hidden;
+    transition: transform 0.2s;
+}
+
+.kpi-card:hover { transform: translateY(-2px); }
+.kpi-card.purple { background: rgba(108,92,231,0.1); border-color: rgba(108,92,231,0.3); }
+.kpi-card.warning { background: rgba(253,203,110,0.1); border-color: rgba(253,203,110,0.3); }
+.kpi-card.success { background: rgba(0,184,148,0.1); border-color: rgba(0,184,148,0.3); }
+.kpi-card.info { background: rgba(9,132,227,0.1); border-color: rgba(9,132,227,0.3); }
+
+.kpi-icon { font-size: 1.5rem; opacity: 0.5; margin-bottom: 4px; }
+.kpi-value { font-size: 2.5rem; font-weight: 900; }
+.kpi-label { font-size: 0.78rem; color: var(--nexq-text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+.kpi-card.purple .kpi-value { color: var(--nexq-purple); }
+.kpi-card.warning .kpi-value { color: var(--nexq-warning); }
+.kpi-card.success .kpi-value { color: var(--nexq-success); }
+.kpi-card.info .kpi-value { color: var(--nexq-info); }
+
+/* ─── ALERTS ─────────────────────────────────────────────────── */
+.alert { border-radius: 10px; border: none; font-size: 0.875rem; }
+.alert-success { background: rgba(0,184,148,0.15); color: #00b894; }
+.alert-danger { background: rgba(214,48,49,0.15); color: #ff7675; }
+.alert-warning { background: rgba(253,203,110,0.15); color: #fdcb6e; }
+
+/* ─── TEXT COLORS ────────────────────────────────────────────── */
+.text-purple { color: var(--nexq-purple) !important; }
+.fw-500 { font-weight: 500; }
+.fw-600 { font-weight: 600; }
+
+/* ─── SCROLLBAR ──────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--nexq-bg); }
+::-webkit-scrollbar-thumb { background: var(--nexq-border); border-radius: 3px; }
+
+/* ─── RESPONSIVE ─────────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .welcome-banner { flex-direction: column; gap: 12px; text-align: center; }
+    .welcome-icon { display: none; }
+    .glass-card { padding: 20px; }
+    .token-number { font-size: 2.5rem; }
+}

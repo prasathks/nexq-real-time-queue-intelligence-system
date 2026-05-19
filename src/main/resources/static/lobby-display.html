@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexQ — Lobby Display</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0f0f13;
+            color: #ffffff;
+            font-family: 'Outfit', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            background: linear-gradient(90deg, #6c5ce7 0%, #a29bfe 100%);
+            padding: 1.5rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);
+            z-index: 10;
+        }
+        .brand {
+            font-size: 2.5rem;
+            font-weight: 900;
+            letter-spacing: -1px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .clock {
+            font-size: 2.5rem;
+            font-weight: 500;
+            font-variant-numeric: tabular-nums;
+        }
+        .main-content {
+            flex: 1;
+            display: flex;
+            padding: 2rem;
+            gap: 2rem;
+        }
+        /* Now Serving Section */
+        .serving-section {
+            flex: 1;
+            background: #1a1a24;
+            border-radius: 24px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+        .section-title {
+            font-size: 1.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #a29bfe;
+            margin-bottom: 2rem;
+            font-weight: 700;
+        }
+        .now-serving-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            flex: 1;
+        }
+        .serving-card {
+            background: linear-gradient(135deg, rgba(0, 184, 148, 0.1) 0%, rgba(0, 184, 148, 0.05) 100%);
+            border: 2px solid rgba(0, 184, 148, 0.3);
+            border-radius: 20px;
+            padding: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: pulse-border 2s infinite;
+        }
+        @keyframes pulse-border {
+            0% { border-color: rgba(0, 184, 148, 0.2); }
+            50% { border-color: rgba(0, 184, 148, 0.8); box-shadow: 0 0 20px rgba(0, 184, 148, 0.2); }
+            100% { border-color: rgba(0, 184, 148, 0.2); }
+        }
+        .serving-number {
+            font-size: 6rem;
+            font-weight: 900;
+            color: #00b894;
+            line-height: 1;
+        }
+        .serving-queue {
+            font-size: 2rem;
+            color: #ffffff;
+            opacity: 0.9;
+        }
+        
+        /* Waiting Section */
+        .waiting-section {
+            width: 400px;
+            background: #1a1a24;
+            border-radius: 24px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .waiting-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            overflow-y: auto;
+            flex: 1;
+        }
+        .waiting-item {
+            padding: 1.2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .waiting-item:last-child {
+            border-bottom: none;
+        }
+        .waiting-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #fdcb6e;
+        }
+        .priority-badge {
+            font-size: 1.2rem;
+            padding: 5px 10px;
+            border-radius: 8px;
+            background: rgba(214, 48, 49, 0.2);
+            color: #ff7675;
+            font-weight: bold;
+        }
+        
+        /* Select Queue Overlay */
+        #setupOverlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 15, 19, 0.95);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .setup-card {
+            background: #1a1a24;
+            padding: 3rem;
+            border-radius: 24px;
+            width: 500px;
+            text-align: center;
+            border: 1px solid rgba(108, 92, 231, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+<div id="setupOverlay">
+    <div class="setup-card">
+        <h2 class="mb-4">NexQ Lobby Display</h2>
+        <p class="text-muted mb-4">Select a branch or queue to display</p>
+        <select id="queueSelector" class="form-select form-select-lg mb-4 bg-dark text-white border-secondary">
+            <option value="">Loading...</option>
+        </select>
+        <button class="btn btn-primary btn-lg w-100" style="background:#6c5ce7; border:none;" onclick="startDisplay()">Start Display</button>
+    </div>
+</div>
+
+<div class="header">
+    <div class="brand"><i class="bi bi-collection"></i> NexQ Lobby</div>
+    <div class="clock" id="clockDisplay">00:00:00</div>
+</div>
+
+<div class="main-content">
+    <div class="serving-section">
+        <div class="section-title">Now Serving</div>
+        <div class="now-serving-grid" id="servingGrid">
+            <!-- Serving cards injected here -->
+        </div>
+    </div>
+    
+    <div class="waiting-section">
+        <div class="section-title" style="color: #fdcb6e;">Up Next</div>
+        <ul class="waiting-list" id="waitingList">
+            <!-- Waiting items injected here -->
+        </ul>
+    </div>
+</div>
+
+<!-- Audio for notification -->
+<audio id="chime" src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_0625c1539c.mp3?filename=success-1-6297.mp3" preload="auto"></audio>
+
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<script>
+    let currentQueueId = null;
+    let stompClient = null;
+    let lastServingIds = [];
+
+    window.onload = async () => {
+        startClock();
+        try {
+            const res = await fetch('/api/queues/all'); // Allow public? Need to check auth for this endpoint in real app.
+            if(res.status === 401) {
+                // If this is a protected route, in a real app TV displays have a special role or use a public endpoint.
+                // For this demo, let's assume the user is logged in as staff/admin on this browser.
+                alert('Please log in as Staff/Admin first to configure the TV display.');
+                window.location.href = '/login.html';
+                return;
+            }
+            const queues = await res.json();
+            const sel = document.getElementById('queueSelector');
+            sel.innerHTML = '<option value="">-- Select Queue --</option>' + 
+                queues.filter(q=>q.isActive).map(q => `<option value="${q.id}">${q.name} (${q.branchName||'No Branch'})</option>`).join('');
+        } catch(err) {
+            console.error(err);
+        }
+    };
+
+    function startClock() {
+        setInterval(() => {
+            document.getElementById('clockDisplay').textContent = new Date().toLocaleTimeString('en-US', { hour12: false });
+        }, 1000);
+    }
+
+    function startDisplay() {
+        const queueId = document.getElementById('queueSelector').value;
+        if(!queueId) return;
+        currentQueueId = queueId;
+        document.getElementById('setupOverlay').style.display = 'none';
+        
+        connectWebSocket();
+        loadData();
+    }
+
+    function connectWebSocket() {
+        const socket = new SockJS('/ws-nexq');
+        stompClient = Stomp.over(socket);
+        stompClient.debug = null;
+        stompClient.connect({}, function(frame) {
+            stompClient.subscribe('/topic/queue/' + currentQueueId, function(message) {
+                loadData();
+            });
+        });
+    }
+
+    async function loadData() {
+        try {
+            const tokenStr = localStorage.getItem('nexq_token');
+            const headers = tokenStr ? { 'Authorization': `Bearer ${tokenStr}` } : {};
+
+            const [servingRes, waitingRes] = await Promise.all([
+                fetch(`/api/queues/${currentQueueId}/tokens?status=SERVING`, {headers}),
+                fetch(`/api/queues/${currentQueueId}/tokens?status=WAITING`, {headers})
+            ]);
+            
+            const serving = await servingRes.json();
+            const waiting = await waitingRes.json();
+
+            // Check if there are new serving tokens to play a chime
+            const currentServingIds = serving.map(t => t.id);
+            const newServing = currentServingIds.filter(id => !lastServingIds.includes(id));
+            if (newServing.length > 0 && lastServingIds.length > 0) {
+                document.getElementById('chime').play().catch(e=>console.log('Audio blocked by browser'));
+            }
+            lastServingIds = currentServingIds;
+
+            // Render Serving
+            const servingGrid = document.getElementById('servingGrid');
+            if (serving.length === 0) {
+                servingGrid.innerHTML = `<div class="text-center text-muted mt-5"><h3>No active tokens</h3></div>`;
+            } else {
+                servingGrid.innerHTML = serving.map(t => `
+                    <div class="serving-card">
+                        <div>
+                            <div class="text-muted text-uppercase fw-bold mb-2">Token Number</div>
+                            <div class="serving-number">#${t.tokenNumber}</div>
+                        </div>
+                        <div class="text-end">
+                            <div class="serving-queue">${t.queueName}</div>
+                            ${t.priorityWeight > 0 ? `<div class="badge bg-danger fs-4 mt-2">${t.priorityWeight===2?'🚨 Emergency':'🟡 Priority'}</div>` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Render Waiting
+            const waitingList = document.getElementById('waitingList');
+            if (waiting.length === 0) {
+                waitingList.innerHTML = `<li class="text-center text-muted py-4">Queue is empty</li>`;
+            } else {
+                waitingList.innerHTML = waiting.slice(0, 8).map(t => `
+                    <li class="waiting-item">
+                        <div class="waiting-number">#${t.tokenNumber}</div>
+                        ${t.priorityWeight > 0 ? `<div class="priority-badge">${t.priorityWeight===2?'🚨 Emergency':'Priority'}</div>` : ''}
+                    </li>
+                `).join('');
+            }
+        } catch(err) {
+            console.error('Failed to load display data:', err);
+        }
+    }
+</script>
+</body>
+</html>

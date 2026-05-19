@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  nexq-db:
+    image: mysql:8.0
+    container_name: nexq-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: nexq_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - nexq-mysql-data:/var/lib/mysql
+    networks:
+      - nexq-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  nexq-redis:
+    image: redis:7-alpine
+    container_name: nexq-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - nexq-network
+
+  nexq-ai-service:
+    build: ./ai-service
+    container_name: nexq-ai-service
+    ports:
+      - "8000:8000"
+    networks:
+      - nexq-network
+
+  nexq-app:
+    build: .
+    container_name: nexq-app
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:mysql://nexq-db:3306/nexq_db?createDatabaseIfNotExist=true&useSSL=false
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_DATA_REDIS_HOST=nexq-redis
+      - SPRING_DATA_REDIS_PORT=6379
+      - AI_SERVICE_URL=http://nexq-ai-service:8000
+    depends_on:
+      nexq-db:
+        condition: service_healthy
+      nexq-redis:
+        condition: service_started
+    networks:
+      - nexq-network
+
+networks:
+  nexq-network:
+    driver: bridge
+
+volumes:
+  nexq-mysql-data:

@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexQ — Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js" rel="prefetch">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body class="dashboard-page">
+<nav class="navbar nexq-navbar">
+    <div class="container-fluid px-4">
+        <a class="navbar-brand" href="#"><div class="brand-logo-sm"><i class="bi bi-collection"></i></div>NexQ</a>
+        <div class="d-flex align-items-center gap-3 ms-auto">
+            <span class="badge role-badge admin">ADMIN</span>
+            <span class="text-light" id="userNameNav"></span>
+            <button class="btn btn-outline-light btn-sm" onclick="logout()"><i class="bi bi-box-arrow-right"></i></button>
+        </div>
+    </div>
+</nav>
+<div class="container-fluid px-4 py-4">
+    <div class="welcome-banner admin-banner mb-4">
+        <div><h2 class="mb-1">Admin Dashboard 🛡️</h2>
+        <p class="mb-0 opacity-75">Full system control — queues, analytics, and user management</p></div>
+        <div class="welcome-icon"><i class="bi bi-shield-check"></i></div>
+    </div>
+    <!-- KPI Cards -->
+    <div class="row g-3 mb-4" id="kpiCards">
+        <div class="col-6 col-lg-3"><div class="kpi-card purple"><i class="bi bi-list-ul kpi-icon"></i>
+            <div class="kpi-value" id="kpiQueues">-</div><div class="kpi-label">Active Queues</div></div></div>
+        <div class="col-6 col-lg-3"><div class="kpi-card warning"><i class="bi bi-hourglass-split kpi-icon"></i>
+            <div class="kpi-value" id="kpiWaiting">-</div><div class="kpi-label">Waiting Now</div></div></div>
+        <div class="col-6 col-lg-3"><div class="kpi-card success"><i class="bi bi-check-circle kpi-icon"></i>
+            <div class="kpi-value" id="kpiServed">-</div><div class="kpi-label">Served Today</div></div></div>
+        <div class="col-6 col-lg-3"><div class="kpi-card info"><i class="bi bi-people kpi-icon"></i>
+            <div class="kpi-value" id="kpiTotal">-</div><div class="kpi-label">Total Tokens</div></div></div>
+    </div>
+    <!-- Analytics Section -->
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-md-4">
+            <div class="card nexq-card p-3">
+                <label class="form-label fw-600 text-purple mb-2">Analytics for Queue</label>
+                <select class="form-select" id="analyticsQueueSelector" onchange="loadAnalytics()">
+                    <option value="">-- Select Queue --</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="row g-4 mb-4">
+        <div class="col-12 col-lg-6">
+            <div class="card nexq-card p-3">
+                <h6 class="section-title mb-3"><i class="bi bi-bar-chart me-2"></i>Daily Token Volume</h6>
+                <div style="height:250px"><canvas id="dailyChart"></canvas></div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-6">
+            <div class="card nexq-card p-3">
+                <h6 class="section-title mb-3"><i class="bi bi-clock me-2"></i>Avg Wait Time by Hour</h6>
+                <div style="height:250px"><canvas id="waitChart"></canvas></div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-6">
+            <div class="card nexq-card p-3">
+                <h6 class="section-title mb-3"><i class="bi bi-activity me-2"></i>Peak Hours</h6>
+                <div style="height:250px"><canvas id="peakChart"></canvas></div>
+            </div>
+        </div>
+    </div>
+    <!-- Branch Management Table -->
+    <div class="mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="section-title mb-0"><i class="bi bi-building me-2"></i>Branch Management</h5>
+            <button class="btn btn-primary-nexq btn-sm" data-bs-toggle="modal" data-bs-target="#createBranchModal">
+                <i class="bi bi-plus me-1"></i>New Branch
+            </button>
+        </div>
+        <div class="card nexq-card"><div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table nexq-table mb-0">
+                    <thead><tr><th>ID</th><th>Branch Name</th><th>Location</th><th>Active Queues</th><th>Status</th></tr></thead>
+                    <tbody id="adminBranchesBody"><tr><td colspan="5" class="text-center py-4 text-muted">Loading...</td></tr></tbody>
+                </table>
+            </div>
+        </div></div>
+    </div>
+    <!-- Queue Management Table -->
+    <div class="mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="section-title mb-0"><i class="bi bi-gear me-2"></i>Queue Management</h5>
+            <button class="btn btn-primary-nexq btn-sm" data-bs-toggle="modal" data-bs-target="#createQueueModal">
+                <i class="bi bi-plus me-1"></i>New Queue
+            </button>
+        </div>
+        <div class="card nexq-card"><div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table nexq-table mb-0">
+                    <thead><tr><th>ID</th><th>Name</th><th>Branch</th><th>Location</th><th>Status</th><th>Waiting</th><th>Actions</th></tr></thead>
+                    <tbody id="adminQueuesBody"><tr><td colspan="6" class="text-center py-4 text-muted">Loading...</td></tr></tbody>
+                </table>
+            </div>
+        </div></div>
+    </div>
+</div>
+<!-- Create Branch Modal -->
+<div class="modal fade" id="createBranchModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content nexq-modal">
+            <div class="modal-header border-0">
+                <h5 class="modal-title"><i class="bi bi-plus-circle me-2 text-purple"></i>Create New Branch</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="createBranchAlert" class="alert d-none mb-3"></div>
+                <div class="mb-3"><label class="form-label">Branch Name *</label>
+                    <input type="text" class="form-control" id="newBranchName" placeholder="e.g. Headquarters"></div>
+                <div class="mb-3"><label class="form-label">Location *</label>
+                    <input type="text" class="form-control" id="newBranchLocation" placeholder="e.g. San Francisco"></div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary-nexq" onclick="createBranch()"><i class="bi bi-plus me-1"></i>Create Branch</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Create Queue Modal -->
+<div class="modal fade" id="createQueueModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content nexq-modal">
+            <div class="modal-header border-0">
+                <h5 class="modal-title"><i class="bi bi-plus-circle me-2 text-purple"></i>Create New Queue</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="createQueueAlert" class="alert d-none mb-3"></div>
+                <div class="mb-3"><label class="form-label">Queue Name *</label>
+                    <input type="text" class="form-control" id="newQueueName" placeholder="e.g. Customer Service"></div>
+                <div class="mb-3"><label class="form-label">Branch *</label>
+                    <select class="form-select" id="newQueueBranch">
+                        <option value="">-- Select Branch --</option>
+                    </select></div>
+                <div class="mb-3"><label class="form-label">Description</label>
+                    <textarea class="form-control" id="newQueueDesc" rows="2"></textarea></div>
+                <div class="mb-3"><label class="form-label">Location</label>
+                    <input type="text" class="form-control" id="newQueueLocation" placeholder="Counter A, Floor 2"></div>
+                <div class="mb-3"><label class="form-label">Max Capacity</label>
+                    <input type="number" class="form-control" id="newQueueCapacity" placeholder="Leave blank for unlimited" min="1"></div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary-nexq" onclick="createQueue()"><i class="bi bi-plus me-1"></i>Create</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- QR Code Modal -->
+<div class="modal fade" id="qrModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content nexq-modal text-center">
+            <div class="modal-header border-0">
+                <h5 class="modal-title w-100" id="qrModalTitle">Queue QR Code</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pb-4">
+                <img id="qrImage" src="" alt="QR Code" class="img-fluid rounded shadow-sm bg-white p-2 mb-3">
+                <p class="text-muted small mb-0">Users can scan this to join the queue instantly.</p>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script src="js/app.js"></script>
+<script>
+    requireAuth('ADMIN');
+    const user = JSON.parse(localStorage.getItem('nexq_user') || '{}');
+    document.getElementById('userNameNav').textContent = user.name || '';
+    let charts = {};
+
+    window.onload = async () => { await loadAdminData(); };
+
+    async function loadAdminData() {
+        try {
+            const [queues, branches] = await Promise.all([
+                apiGet('/api/queues/all'),
+                apiGet('/api/branches/all')
+            ]);
+            // KPIs
+            document.getElementById('kpiQueues').textContent = queues.filter(q=>q.isActive).length;
+            document.getElementById('kpiWaiting').textContent = queues.reduce((s,q)=>s+q.waitingCount,0);
+            document.getElementById('kpiServed').textContent = queues.reduce((s,q)=>s+q.completedToday,0);
+            document.getElementById('kpiTotal').textContent = queues.reduce((s,q)=>s+q.waitingCount+q.servingCount+q.completedToday,0);
+            
+            // Branch table
+            document.getElementById('adminBranchesBody').innerHTML = branches.map(b => `
+                <tr>
+                    <td class="text-muted">#${b.id}</td>
+                    <td class="fw-600">${escHtml(b.name)}</td>
+                    <td class="text-muted">${escHtml(b.location)}</td>
+                    <td><span class="badge bg-info">${b.activeQueuesCount}</span></td>
+                    <td><span class="badge ${b.isActive?'bg-success':'bg-secondary'}">${b.isActive?'Active':'Inactive'}</span></td>
+                </tr>`).join('');
+                
+            // Populate branch selector
+            document.getElementById('newQueueBranch').innerHTML = '<option value="">-- Select Branch --</option>' + 
+                branches.filter(b=>b.isActive).map(b=>`<option value="${b.id}">${escHtml(b.name)}</option>`).join('');
+
+            // Queue table
+            document.getElementById('adminQueuesBody').innerHTML = queues.map(q => `
+                <tr>
+                    <td class="text-muted">#${q.id}</td>
+                    <td class="fw-600">${escHtml(q.name)}</td>
+                    <td class="text-muted"><i class="bi bi-building me-1"></i>${escHtml(q.branchName||'None')}</td>
+                    <td class="text-muted">${escHtml(q.location||'-')}</td>
+                    <td><span class="badge ${q.isActive?'bg-success':'bg-secondary'}">${q.isActive?'Active':'Inactive'}</span></td>
+                    <td><span class="text-warning fw-bold">${q.waitingCount}</span></td>
+                    <td>
+                        <button class="btn btn-xs btn-outline-info me-1" onclick="showQR(${q.id}, '${escHtml(q.name)}')">
+                            <i class="bi bi-qr-code"></i> QR
+                        </button>
+                        <button class="btn btn-xs btn-outline-danger" onclick="deactivateQueue(${q.id},'${escHtml(q.name)}')">
+                            <i class="bi bi-pause-fill"></i> Deactivate
+                        </button>
+                    </td>
+                </tr>`).join('');
+            // Populate analytics selector
+            const sel = document.getElementById('analyticsQueueSelector');
+            sel.innerHTML = '<option value="">-- Select Queue --</option>' +
+                queues.map(q=>`<option value="${q.id}">${escHtml(q.name)}</option>`).join('');
+        } catch(err) { console.error(err); }
+    }
+
+    async function loadAnalytics() {
+        const queueId = document.getElementById('analyticsQueueSelector').value;
+        if (!queueId) return;
+        try {
+            const [daily, waitTime, peaks] = await Promise.all([
+                apiGet(`/api/analytics/queues/${queueId}/daily-stats`),
+                apiGet(`/api/analytics/queues/${queueId}/wait-time`),
+                apiGet(`/api/analytics/queues/${queueId}/peak-hours`)
+            ]);
+            renderDailyChart(daily);
+            renderWaitChart(waitTime);
+            renderPeakChart(peaks);
+        } catch(err) { console.error('Analytics error:', err); }
+    }
+
+    function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
+
+    function renderDailyChart(data) {
+        destroyChart('daily');
+        const ctx = document.getElementById('dailyChart').getContext('2d');
+        charts['daily'] = new Chart(ctx, { type: 'bar',
+            data: { labels: (data.dailyStats||[]).map(d=>d.date),
+                datasets: [
+                    { label:'Total', data:(data.dailyStats||[]).map(d=>d.total), backgroundColor:'rgba(108,92,231,0.6)', borderColor:'#6c5ce7', borderWidth:2 },
+                    { label:'Served', data:(data.dailyStats||[]).map(d=>d.served), backgroundColor:'rgba(0,184,148,0.6)', borderColor:'#00b894', borderWidth:2 }
+                ]},
+            options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{labels:{color:'#ccc'}}}, scales:{x:{ticks:{color:'#aaa'}},y:{ticks:{color:'#aaa'}}}}
+        });
+    }
+
+    function renderWaitChart(data) {
+        destroyChart('wait');
+        const ctx = document.getElementById('waitChart').getContext('2d');
+        charts['wait'] = new Chart(ctx, { type: 'line',
+            data: { labels: (data.hours||[]).map(h=>`${h}:00`),
+                datasets:[{ label:'Avg Wait (min)', data:data.avgWaitMinutes||[], borderColor:'#fdcb6e', backgroundColor:'rgba(253,203,110,0.1)', tension:0.4, fill:true }]},
+            options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{labels:{color:'#ccc'}}}, scales:{x:{ticks:{color:'#aaa'}},y:{ticks:{color:'#aaa'}}}}
+        });
+    }
+
+    function renderPeakChart(data) {
+        destroyChart('peak');
+        const ctx = document.getElementById('peakChart').getContext('2d');
+        const peaks = data.peakHours||[];
+        charts['peak'] = new Chart(ctx, { type: 'bar',
+            data: { labels: peaks.map(p=>`${p.hour}:00`),
+                datasets:[{ label:'Tokens', data:peaks.map(p=>p.count), backgroundColor:'rgba(214,48,49,0.6)', borderColor:'#d63031', borderWidth:2 }]},
+            options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{labels:{color:'#ccc'}}}, scales:{x:{ticks:{color:'#aaa'}},y:{ticks:{color:'#aaa'}}}}
+        });
+    }
+
+    async function deactivateQueue(id, name) {
+        if (!confirm(`Deactivate queue "${name}"?`)) return;
+        try {
+            await apiDelete(`/api/queues/${id}`);
+            await loadAdminData();
+        } catch(err) { alert('Error: ' + err.message); }
+    }
+
+    async function createBranch() {
+        const name = document.getElementById('newBranchName').value.trim();
+        const location = document.getElementById('newBranchLocation').value.trim();
+        if (!name || !location) { showAlertIn('createBranchAlert','Name and location required','warning'); return; }
+        try {
+            await apiPost('/api/branches', { name, location });
+            bootstrap.Modal.getInstance(document.getElementById('createBranchModal')).hide();
+            await loadAdminData();
+        } catch(err) { showAlertIn('createBranchAlert',err.message,'danger'); }
+    }
+
+    async function createQueue() {
+        const name = document.getElementById('newQueueName').value.trim();
+        const branchId = document.getElementById('newQueueBranch').value;
+        if (!name) { showAlertIn('createQueueAlert','Queue name is required','warning'); return; }
+        const maxCapacity = document.getElementById('newQueueCapacity').value;
+        try {
+            await apiPost('/api/queues', { 
+                name, 
+                branchId: branchId ? parseInt(branchId) : null,
+                description: document.getElementById('newQueueDesc').value, 
+                location: document.getElementById('newQueueLocation').value,
+                maxCapacity: maxCapacity ? parseInt(maxCapacity) : null
+            });
+            bootstrap.Modal.getInstance(document.getElementById('createQueueModal')).hide();
+            await loadAdminData();
+        } catch(err) { showAlertIn('createQueueAlert',err.message,'danger'); }
+    }
+
+    function showQR(id, name) {
+        document.getElementById('qrModalTitle').textContent = name;
+        document.getElementById('qrImage').src = `/api/queues/${id}/qr`;
+        new bootstrap.Modal(document.getElementById('qrModal')).show();
+    }
+</script>
+</body>
+</html>

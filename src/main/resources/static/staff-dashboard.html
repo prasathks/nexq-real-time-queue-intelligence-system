@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexQ — Staff Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body class="dashboard-page">
+<nav class="navbar nexq-navbar">
+    <div class="container-fluid px-4">
+        <a class="navbar-brand" href="#"><div class="brand-logo-sm"><i class="bi bi-collection"></i></div>NexQ</a>
+        <div class="d-flex align-items-center gap-3 ms-auto">
+            <span class="badge role-badge staff">STAFF</span>
+            <span class="text-light" id="userNameNav"></span>
+            <button class="btn btn-outline-light btn-sm" onclick="logout()"><i class="bi bi-box-arrow-right"></i></button>
+        </div>
+    </div>
+</nav>
+<div class="container-fluid px-4 py-4">
+    <div class="welcome-banner staff-banner mb-4">
+        <div><h2 class="mb-1">Staff Control Panel 🎛️</h2>
+        <p class="mb-0 opacity-75">Manage queue tokens — serve, complete, or skip</p></div>
+        <div class="welcome-icon"><i class="bi bi-person-workspace"></i></div>
+    </div>
+    <!-- Queue Selector -->
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-md-6">
+            <div class="card nexq-card p-3">
+                <label class="form-label fw-600 text-purple">Select Queue to Manage</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-list-ul"></i></span>
+                    <select class="form-select" id="queueSelector" onchange="loadQueueTokens()">
+                        <option value="">-- Select a Queue --</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="card nexq-card p-3">
+                <div class="row g-2" id="queueStatsBar">
+                    <div class="col-4"><div class="stat-mini waiting"><span id="statWaiting">-</span><small>Waiting</small></div></div>
+                    <div class="col-4"><div class="stat-mini serving"><span id="statServing">-</span><small>Serving</small></div></div>
+                    <div class="col-4"><div class="stat-mini done"><span id="statDone">-</span><small>Done</small></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Serve Next Button -->
+    <div class="d-flex gap-3 mb-4" id="servePanel">
+        <button class="btn btn-success-nexq px-4" onclick="serveNext()" id="serveNextBtn" disabled>
+            <i class="bi bi-play-fill me-2"></i>Serve Next Token
+        </button>
+        <button class="btn btn-outline-info" onclick="showQR()" id="qrBtn" disabled>
+            <i class="bi bi-qr-code me-1"></i>Show QR
+        </button>
+        <button class="btn btn-outline-nexq" onclick="loadQueueTokens()" id="refreshBtn">
+            <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+        </button>
+    </div>
+    <div id="staffAlert" class="alert d-none mb-3"></div>
+    <!-- Currently Serving -->
+    <div id="servingSection" class="d-none mb-4">
+        <h5 class="section-title"><i class="bi bi-person-check me-2"></i>Currently Serving</h5>
+        <div class="row g-3" id="servingTokens"></div>
+    </div>
+    <!-- Waiting Queue -->
+    <div>
+        <h5 class="section-title"><i class="bi bi-hourglass-split me-2"></i>Waiting Queue</h5>
+        <div class="card nexq-card"><div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table nexq-table mb-0">
+                    <thead><tr><th>#</th><th>Name</th><th>Email</th><th>Issued At</th><th>Wait</th><th>Actions</th></tr></thead>
+                    <tbody id="waitingTokensBody"><tr><td colspan="6" class="text-center py-4 text-muted">Select a queue above</td></tr></tbody>
+                </table>
+            </div>
+        </div></div>
+    </div>
+</div>
+<!-- Create Queue Modal -->
+<div class="modal fade" id="createQueueModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content nexq-modal">
+            <div class="modal-header border-0">
+                <h5 class="modal-title"><i class="bi bi-plus-circle me-2 text-purple"></i>Create Queue</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="createQueueAlert" class="alert d-none mb-3"></div>
+                <div class="mb-3"><label class="form-label">Queue Name *</label>
+                    <input type="text" class="form-control" id="newQueueName" placeholder="e.g. Customer Service"></div>
+                <div class="mb-3"><label class="form-label">Description</label>
+                    <textarea class="form-control" id="newQueueDesc" rows="2"></textarea></div>
+                <div class="mb-3"><label class="form-label">Location</label>
+                    <input type="text" class="form-control" id="newQueueLocation" placeholder="e.g. Counter A, Floor 2"></div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary-nexq" onclick="createQueue()">
+                    <i class="bi bi-plus me-1"></i>Create Queue
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- QR Code Modal -->
+<div class="modal fade" id="qrModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content nexq-modal text-center">
+            <div class="modal-header border-0">
+                <h5 class="modal-title w-100" id="qrModalTitle">Queue QR Code</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pb-4">
+                <img id="qrImage" src="" alt="QR Code" class="img-fluid rounded shadow-sm bg-white p-2 mb-3">
+                <p class="text-muted small mb-0">Users can scan this to join the queue instantly.</p>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/app.js"></script>
+<script>
+    requireAuth('STAFF');
+    const user = JSON.parse(localStorage.getItem('nexq_user') || '{}');
+    document.getElementById('userNameNav').textContent = user.name || '';
+
+    window.onload = async () => {
+        await loadQueueSelector();
+    };
+
+    async function loadQueueSelector() {
+        try {
+            const queues = await apiGet('/api/queues');
+            const sel = document.getElementById('queueSelector');
+            queues.forEach(q => {
+                const opt = document.createElement('option');
+                opt.value = q.id; opt.textContent = q.name;
+                sel.appendChild(opt);
+            });
+        } catch(err) { console.error(err); }
+    }
+
+    async function loadQueueTokens() {
+        const queueId = document.getElementById('queueSelector').value;
+        if (!queueId) {
+            document.getElementById('serveNextBtn').disabled = true;
+            document.getElementById('qrBtn').disabled = true;
+            return;
+        }
+        document.getElementById('serveNextBtn').disabled = false;
+        document.getElementById('qrBtn').disabled = false;
+        try {
+            const [waiting, serving, queueInfo] = await Promise.all([
+                apiGet(`/api/queues/${queueId}/tokens?status=WAITING`),
+                apiGet(`/api/queues/${queueId}/tokens?status=SERVING`),
+                apiGet(`/api/queues/${queueId}`)
+            ]);
+            document.getElementById('statWaiting').textContent = queueInfo.waitingCount;
+            document.getElementById('statServing').textContent = queueInfo.servingCount;
+            document.getElementById('statDone').textContent = queueInfo.completedToday;
+
+            // Serving section
+            if (serving.length) {
+                document.getElementById('servingSection').classList.remove('d-none');
+                document.getElementById('servingTokens').innerHTML = serving.map(t => `
+                    <div class="col-12 col-md-6">
+                        <div class="serving-token-card">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div><div class="token-number-sm text-success">#${t.tokenNumber} 
+                                    ${t.priorityWeight > 0 ? (t.priorityWeight===2?'🚨':'🟡') : ''}</div>
+                                    <div class="fw-600">${escHtml(t.userName)}</div>
+                                    <div class="text-muted small">${escHtml(t.userEmail)}</div></div>
+                                <div class="d-flex flex-column gap-2">
+                                    <button class="btn btn-sm btn-success" onclick="completeToken(${t.id})">
+                                        <i class="bi bi-check-lg me-1"></i>Complete
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="skipToken(${t.id})">
+                                        <i class="bi bi-skip-forward me-1"></i>Skip
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`).join('');
+            } else {
+                document.getElementById('servingSection').classList.add('d-none');
+            }
+
+            // Waiting table
+            const tbody = document.getElementById('waitingTokensBody');
+            tbody.innerHTML = !waiting.length ? '<tr><td colspan="6" class="text-center py-4 text-muted">No waiting tokens</td></tr>' :
+                waiting.map(t => `<tr>
+                    <td><span class="fw-bold text-purple">#${t.tokenNumber}</span>
+                        ${t.priorityWeight > 0 ? (t.priorityWeight===2?'🚨':'🟡') : ''}</td>
+                    <td>${escHtml(t.userName)}</td>
+                    <td class="text-muted small">${escHtml(t.userEmail)}</td>
+                    <td>${formatDate(t.issuedAt)}</td>
+                    <td>${Math.max(0, Math.round((new Date(t.expiresAt) - new Date()) / 60000))} min left</td>
+                    <td><button class="btn btn-xs btn-outline-danger" onclick="skipToken(${t.id})">
+                        <i class="bi bi-skip-forward"></i> Skip</button></td></tr>`).join('');
+        } catch(err) { showAlertIn('staffAlert','Error loading tokens: '+err.message,'danger'); }
+    }
+
+    async function serveNext() {
+        const queueId = document.getElementById('queueSelector').value;
+        if (!queueId) return;
+        try {
+            await apiPut(`/api/queues/${queueId}/tokens/serve-next`, {});
+            showAlertIn('staffAlert','Next token is now being served','success');
+            await loadQueueTokens();
+        } catch(err) { showAlertIn('staffAlert',err.message,'danger'); }
+    }
+
+    async function completeToken(tokenId) {
+        try {
+            await apiPut(`/api/tokens/${tokenId}/complete`, {});
+            showAlertIn('staffAlert','Token completed successfully','success');
+            await loadQueueTokens();
+        } catch(err) { showAlertIn('staffAlert',err.message,'danger'); }
+    }
+
+    async function skipToken(tokenId) {
+        try {
+            await apiPut(`/api/tokens/${tokenId}/skip`, {});
+            showAlertIn('staffAlert','Token skipped','warning');
+            await loadQueueTokens();
+        } catch(err) { showAlertIn('staffAlert',err.message,'danger'); }
+    }
+
+    async function createQueue() {
+        const name = document.getElementById('newQueueName').value.trim();
+        if (!name) { showAlertIn('createQueueAlert','Queue name is required','warning'); return; }
+        try {
+            await apiPost('/api/queues', {
+                name, description: document.getElementById('newQueueDesc').value,
+                location: document.getElementById('newQueueLocation').value
+            });
+            bootstrap.Modal.getInstance(document.getElementById('createQueueModal')).hide();
+            await loadQueueSelector(); loadQueueTokens();
+        } catch(err) { showAlertIn('createQueueAlert',err.message,'danger'); }
+    }
+
+    function showQR() {
+        const sel = document.getElementById('queueSelector');
+        const queueId = sel.value;
+        const name = sel.options[sel.selectedIndex].text;
+        if (!queueId) return;
+        document.getElementById('qrModalTitle').textContent = name;
+        document.getElementById('qrImage').src = `/api/queues/${queueId}/qr`;
+        new bootstrap.Modal(document.getElementById('qrModal')).show();
+    }
+</script>
+</body>
+</html>
